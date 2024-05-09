@@ -24,5 +24,6 @@
         <module>TodoService</module>
         <module>UserService</module>
         <module>ServiceDiscovery</module>
+        <module>ConfigServer</module>
     </modules>
 </project>
