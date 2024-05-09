@@ -1,33 +1,55 @@
 package org.spring.todoservice.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.spring.todoservice.dtos.TaskDTO;
+import org.spring.todoservice.dtos.TodoDTO;
+import org.spring.todoservice.mappers.TaskMapper;
+import org.spring.todoservice.mappers.TodoMapper;
 import org.spring.todoservice.models.TaskEntity;
 import org.spring.todoservice.models.TodoEntity;
 import org.spring.todoservice.service.TodoService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/todos")
+@RequiredArgsConstructor
 public class TodoController {
-    @Autowired
-    private TodoService todoService;
-    @PostMapping("/add-todo")
-    public ResponseEntity<TodoEntity> postTodo(@RequestBody TodoEntity todoEntity){
+
+    private final TodoService todoService;
+    private final TaskMapper taskMapper;
+    private final TodoMapper todoMapper;
+
+
+    @PostMapping
+    public ResponseEntity<TodoEntity> postTodo(@RequestBody TodoDTO todoDTO) {
+        TodoEntity todoEntity = todoMapper.toEntity(todoDTO);
         todoService.createTodo(todoEntity);
         return new ResponseEntity<>(todoEntity, HttpStatus.CREATED);
     }
 
     @PostMapping("/add-task")
-    public ResponseEntity<TaskEntity> addTask(@RequestBody TaskEntity taskEntity, String email){
-        todoService.addTask(taskEntity, email);
-        return new ResponseEntity<>(taskEntity, HttpStatus.CREATED);
+    public ResponseEntity<TaskEntity> addTask(@RequestBody TaskDTO taskDTO) {
+        TaskEntity taskEntity = taskMapper.taskDTOToTaskEntity(taskDTO);
+        todoService.addTask(taskEntity, taskDTO.getEmail());
+        RestTemplate restTemplate = new RestTemplate();
+
+        System.out.println("Sending notification "+taskDTO);
+
+        ResponseEntity<String> stringResponseEntity = restTemplate.
+                postForEntity("http://localhost:4600/notification", taskDTO, String.class);
+        if (stringResponseEntity.getStatusCode().is2xxSuccessful())
+            return new ResponseEntity<>(taskEntity, HttpStatus.CREATED);
+        else
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("{email}")
-    public ResponseEntity<TodoEntity> getTodo(@PathVariable String email){
+    public ResponseEntity<TodoDTO> getTodo(@PathVariable String email) {
         TodoEntity todoEntity = todoService.getTodo(email);
-        return new ResponseEntity<>(todoEntity, HttpStatus.FOUND);
+        TodoDTO todoDTO = todoMapper.toDTO(todoEntity);
+        return new ResponseEntity<>(todoDTO, HttpStatus.OK);
     }
 }

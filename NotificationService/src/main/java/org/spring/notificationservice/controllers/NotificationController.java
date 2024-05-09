@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,7 +20,8 @@ public class NotificationController {
     }
 
     @PostMapping("/notification")
-    public ResponseEntity<String> sendCompletionNotification(TaskDTO taskDTO) {
+    public ResponseEntity<String> sendCompletionNotification(@RequestBody TaskDTO taskDTO) {
+        System.out.println("Sending notification "+taskDTO);
         if (emailNotificationService.sendSimpleMessage(taskDTO))
             return ResponseEntity.ok("Notification sent");
         else

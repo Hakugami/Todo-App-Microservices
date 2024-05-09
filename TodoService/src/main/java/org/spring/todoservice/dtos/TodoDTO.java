@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 public class TodoDTO implements Serializable {
-    private String id;
+
     private String title;
     private String email;
     private List<TaskEntity> taskEntity;

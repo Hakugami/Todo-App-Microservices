@@ -21,6 +21,7 @@ public class EmailNotificationService {
 
 
     public boolean sendSimpleMessage(TaskDTO taskDTO) {
+        System.out.println("Sending email" + taskDTO.getEmail()) ;
 
        try {
            SimpleMailMessage message = buildMessageFromTask(taskDTO);
