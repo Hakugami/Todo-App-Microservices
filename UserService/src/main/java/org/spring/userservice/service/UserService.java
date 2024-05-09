@@ -14,4 +14,24 @@ public class UserService {
     public void createUser(UserEntity user) {
         userRepository.save(user);
     }
+
+    public UserEntity getUser(String id) {
+        return userRepository.findById(id).orElse(null);
+    }
+
+    public void updateUser(UserEntity user) {
+        userRepository.save(user);
+    }
+
+    public void deleteUser(String id) {
+        userRepository.deleteById(id);
+    }
+
+    public UserEntity getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+
+
+
 }
