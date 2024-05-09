@@ -11,7 +11,6 @@ import org.spring.todoservice.service.TodoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 
 @RestController
 @RequestMapping("/todos")
@@ -34,22 +33,17 @@ public class TodoController {
     public ResponseEntity<TaskEntity> addTask(@RequestBody TaskDTO taskDTO) {
         TaskEntity taskEntity = taskMapper.taskDTOToTaskEntity(taskDTO);
         todoService.addTask(taskEntity, taskDTO.getEmail());
-        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> stringResponseEntity = todoService.sendNotification(taskDTO);
 
-        System.out.println("Sending notification "+taskDTO);
-
-        ResponseEntity<String> stringResponseEntity = restTemplate.
-                postForEntity("http://localhost:4600/notification", taskDTO, String.class);
         if (stringResponseEntity.getStatusCode().is2xxSuccessful())
             return new ResponseEntity<>(taskEntity, HttpStatus.CREATED);
         else
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("{email}")
-    public ResponseEntity<TodoDTO> getTodo(@PathVariable String email) {
-        TodoEntity todoEntity = todoService.getTodo(email);
-        TodoDTO todoDTO = todoMapper.toDTO(todoEntity);
+    @GetMapping
+    public ResponseEntity<TodoDTO> getTodo(String email) {
+        TodoDTO todoDTO = todoService.getTodo(email);
         return new ResponseEntity<>(todoDTO, HttpStatus.OK);
     }
 }

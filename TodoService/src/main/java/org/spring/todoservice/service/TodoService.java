@@ -1,11 +1,18 @@
 package org.spring.todoservice.service;
 
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
+import org.spring.todoservice.dtos.TaskDTO;
+import org.spring.todoservice.dtos.TodoDTO;
+import org.spring.todoservice.mappers.TodoMapper;
 import org.spring.todoservice.models.TaskEntity;
 import org.spring.todoservice.models.TodoEntity;
 import org.spring.todoservice.repository.TaskRepository;
 import org.spring.todoservice.repository.TodoRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -13,14 +20,13 @@ public class TodoService {
 
     private final TodoRepository todoRepository;
     private final TaskRepository taskRepository;
+    private final RestTemplate restTemplate;
+    private final EurekaClient eurekaClient;
+    private final TodoMapper todoMapper;
 
-
-    public void saveTodo(TodoEntity todoEntity) {
-        todoRepository.save(todoEntity);
-    }
 
     public void createTodo(TodoEntity todoEntity) {
-        todoRepository.insert(todoEntity);
+        todoRepository.save(todoEntity);
     }
 
     public void addTask(TaskEntity taskEntity, String email) {
@@ -30,7 +36,19 @@ public class TodoService {
         todoRepository.save(todoEntity);
     }
 
-    public TodoEntity getTodo(String email) {
-        return todoRepository.findByEmail(email);
+    public ResponseEntity<String> sendNotification(TaskDTO taskDTO) {
+
+        // Get the instance information of the NotificationService from Eureka
+        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("NOTIFICATIONSERVICE", false);
+        // Build the URL of the NotificationService
+        String baseUrl = instanceInfo.getHomePageUrl();
+
+        return restTemplate.
+                postForEntity(baseUrl + "/notification", taskDTO, String.class);
     }
+
+    public TodoDTO getTodo(String email) {
+        return todoMapper.toDTO(todoRepository.findByEmail(email));
+    }
+
 }
