@@ -1,5 +1,6 @@
 package org.spring.notificationservice.controllers;
 
+import org.spring.notificationservice.dto.TaskDTO;
 import org.spring.notificationservice.services.EmailNotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +19,13 @@ public class NotificationController {
     }
 
     @PostMapping("/notification")
-    public ResponseEntity<String> sendNotification() {
-        emailNotificationService.sendSimpleMessage("nada.mahmoud200002.nm@gmail.com", "Test", "Test");
-        return ResponseEntity.ok("Notification sent");
+    public ResponseEntity<String> sendCompletionNotification(TaskDTO taskDTO) {
+        if (emailNotificationService.sendSimpleMessage(taskDTO))
+            return ResponseEntity.ok("Notification sent");
+        else
+            return ResponseEntity.badRequest().body("Notification failed, ensure that the email is valid");
     }
+
 
 
 }
