@@ -1,5 +1,8 @@
 package org.spring.userservice.controllers;
 
+
+import org.spring.userservice.dtos.UserDTO;
+import org.spring.userservice.mappers.UserMapper;
 import org.spring.userservice.models.UserEntity;
 import org.spring.userservice.service.UserService;
 import org.springframework.http.HttpStatus;
@@ -13,42 +16,44 @@ import java.util.Optional;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
+        this.userMapper = userMapper;
     }
 
     @PostMapping
-    public ResponseEntity<UserEntity> createUser(@RequestBody UserEntity user) {
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDto) {
+        UserEntity user = userMapper.toUserEntity(userDto);
         userService.createUser(user);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return new ResponseEntity<>(userMapper.toUserDTO(user), HttpStatus.CREATED);
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<UserEntity> getUserById(@PathVariable String id) {
+    public ResponseEntity<UserDTO> getUserById(@PathVariable String id) {
         UserEntity user = userService.getUser(id);
-        return user != null ? new ResponseEntity<>(user, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return user != null ? new ResponseEntity<>(userMapper.toUserDTO(user), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @GetMapping("/{email}")
-    public ResponseEntity<UserEntity> getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<UserDTO> getUserByEmail(@PathVariable String email) {
         UserEntity user = userService.getUserByEmail(email);
-        return user != null ? new ResponseEntity<>(user, HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return user != null ? new ResponseEntity<>(userMapper.toUserDTO(user), HttpStatus.OK) : new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserEntity> updateUser(@PathVariable String id, @RequestBody UserEntity user) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable String id, @RequestBody UserDTO userDto) {
         Optional<UserEntity> userData = Optional.ofNullable(userService.getUser(id));
 
         if (userData.isPresent()) {
             UserEntity userEntity = userData.get();
-            userEntity.setUsername(user.getUsername());
-            userEntity.setEmail(user.getEmail());
-            userEntity.setPhone(user.getPhone());
-            userEntity.setPassword(user.getPassword());
+            userEntity.setUsername(userDto.getUsername());
+            userEntity.setEmail(userDto.getEmail());
+            userEntity.setPhone(userDto.getPhone());
 
             userService.updateUser(userEntity);
-            return new ResponseEntity<>(userEntity, HttpStatus.OK);
+            return new ResponseEntity<>(userMapper.toUserDTO(userEntity), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
