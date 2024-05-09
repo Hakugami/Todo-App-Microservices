@@ -1,0 +1,64 @@
+version: '2.24'
+
+services:
+  discovery:
+    build:
+        context: ../ServiceDiscovery
+        dockerfile: Dockerfile
+    image: hakugami/discovery
+    ports:
+      - "8761:8761"
+    mem_limit: 512m
+    networks:
+      - hakugami_network
+
+  notification:
+    build:
+        context: ../NotificationService
+        dockerfile: Dockerfile
+    image: hakugami/notification
+    ports:
+      - "4600:4600"
+    mem_limit: 512m
+    depends_on:
+      - discovery
+    networks:
+      - hakugami_network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+  todo:
+    build:
+        context: ../TodoService
+        dockerfile: Dockerfile
+    image: hakugami/todo
+    ports:
+      - "9090:9090"
+    mem_limit: 512m
+    depends_on:
+      - discovery
+    networks:
+      - hakugami_network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+  user:
+    build:
+        context: ../UserService
+        dockerfile: Dockerfile
+    image: hakugami/user
+    ports:
+      - "4601:4601"
+    mem_limit: 512m
+    depends_on:
+      - discovery
+    networks:
+      - hakugami_network
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://discovery:8761/eureka
+
+networks:
+  hakugami_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16

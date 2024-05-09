@@ -23,5 +23,6 @@
         <module>NotificationService</module>
         <module>TodoService</module>
         <module>UserService</module>
+        <module>ServiceDiscovery</module>
     </modules>
 </project>
