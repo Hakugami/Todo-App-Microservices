@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +24,7 @@ public class TodoEntity {
     private String email;
 
     @DBRef
-    private List<TaskEntity> taskEntity;
+    private List<TaskEntity> taskEntity = new ArrayList<>();
 
     @Override
     public String toString() {

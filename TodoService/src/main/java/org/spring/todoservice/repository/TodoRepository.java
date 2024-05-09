@@ -4,5 +4,5 @@ import org.spring.todoservice.models.TodoEntity;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface TodoRepository extends MongoRepository<TodoEntity, String> {
-
+    TodoEntity findByEmail(String email);
 }
