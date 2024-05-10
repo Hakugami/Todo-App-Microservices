@@ -5,6 +5,7 @@ import com.netflix.discovery.EurekaClient;
 import lombok.RequiredArgsConstructor;
 import org.spring.todoservice.dtos.TaskDTO;
 import org.spring.todoservice.dtos.TodoDTO;
+import org.spring.todoservice.feignclient.NotificationClient;
 import org.spring.todoservice.mappers.TodoMapper;
 import org.spring.todoservice.models.TaskEntity;
 import org.spring.todoservice.models.TodoEntity;
@@ -26,6 +27,7 @@ public class TodoService {
     private final RestTemplate restTemplate;
     private final EurekaClient eurekaClient;
     private final TodoMapper todoMapper;
+    private final NotificationClient notificationClient;
 
 
     public void createTodo(TodoEntity todoEntity) {
@@ -42,12 +44,13 @@ public class TodoService {
     public ResponseEntity<String> sendNotification(TaskDTO taskDTO) {
 
         // Get the instance information of the NotificationService from Eureka
-        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("NOTIFICATIONSERVICE", false);
+//        InstanceInfo instanceInfo = eurekaClient.getNextServerFromEureka("NOTIFICATIONSERVICE", false);
         // Build the URL of the NotificationService
-        String baseUrl = instanceInfo.getHomePageUrl();
+//        String baseUrl = instanceInfo.getHomePageUrl();
 
-        return restTemplate.
-                postForEntity(baseUrl + "/notification", taskDTO, String.class);
+//        return restTemplate.
+//                postForEntity(baseUrl + "/notification", taskDTO, String.class);
+        return notificationClient.sendNotification(taskDTO);
     }
 
     public TodoDTO getTodo(String email) {

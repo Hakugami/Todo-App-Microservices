@@ -21,7 +21,7 @@ public class GatewayApplication {
 
     @Bean
     public RouterFunction<ServerResponse> getRoute() {
-        return route("todos").route(path("/**"),http("lb://todo")).build();
+        return route("todos").route(path("/**"),http("http://localhost:9090")).build();
     }
 
 }
