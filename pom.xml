@@ -25,5 +25,6 @@
         <module>UserService</module>
         <module>ServiceDiscovery</module>
         <module>ConfigServer</module>
+        <module>Gateway</module>
     </modules>
 </project>
