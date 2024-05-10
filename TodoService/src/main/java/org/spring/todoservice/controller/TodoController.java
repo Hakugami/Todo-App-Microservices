@@ -21,7 +21,8 @@ public class TodoController {
     private final TodoService todoService;
     private final TaskMapper taskMapper;
     private final TodoMapper todoMapper;
-
+    @Value("${profile.name}")
+    private String profileName;
 
     @PostMapping
     public ResponseEntity<TodoEntity> postTodo(@RequestBody TodoDTO todoDTO) {
@@ -45,6 +46,7 @@ public class TodoController {
     @GetMapping
     public ResponseEntity<TodoDTO> getTodo(String email) {
         TodoDTO todoDTO = todoService.getTodo(email);
+        System.out.println("in the profile : "+profileName);
         return new ResponseEntity<>(todoDTO, HttpStatus.OK);
     }
 }
