@@ -14,6 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 public class TodoService {
@@ -49,6 +52,11 @@ public class TodoService {
 
     public TodoDTO getTodo(String email) {
         return todoMapper.toDTO(todoRepository.findByEmail(email));
+    }
+
+
+    public List<TodoDTO> getAllTodos() {
+        return todoRepository.findAll().stream().map(todoMapper::toDTO).collect(Collectors.toList());
     }
 
 }

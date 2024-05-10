@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/todos")
 @RequiredArgsConstructor
@@ -49,4 +51,14 @@ public class TodoController {
         System.out.println("in the profile : "+profileName);
         return new ResponseEntity<>(todoDTO, HttpStatus.OK);
     }
+
+
+   // get all todos
+    @GetMapping("/all")
+    public ResponseEntity<List<TodoDTO>> getAllTodos() {
+        List<TodoDTO> todoDTOs = todoService.getAllTodos();
+        System.out.println("in the profile : "+profileName);
+        return new ResponseEntity<>(todoDTOs, HttpStatus.OK);
+    }
+
 }
